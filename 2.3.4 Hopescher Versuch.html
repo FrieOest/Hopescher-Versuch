@@ -1,0 +1,388 @@
+<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Hopescher Versuch – interaktiver Aufbau</title><style>
+:root{font-family:system-ui,-apple-system,Segoe UI,sans-serif;color:#203447;background:#edf3f8}*{box-sizing:border-box}body{margin:0}header{background:#173d5b;color:white;padding:18px max(18px,calc((100vw - 1350px)/2))}h1{font-size:clamp(20px,2.4vw,29px);margin:0 0 4px}header p{margin:0;color:#d6e7f4}main{max-width:1350px;margin:18px auto;padding:0 14px}.layout{display:grid;grid-template-columns:minmax(450px,1.05fr) minmax(390px,1fr);gap:16px}@media(max-width:950px){.layout{grid-template-columns:1fr}}section{background:white;border:1px solid #d4e0e9;border-radius:14px;padding:16px;box-shadow:0 2px 10px #12304b0a}h2{font-size:18px;margin:0 0 10px}.note{font-size:13px;color:#5a7082;line-height:1.5}.parts{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.part{background:#e7f1f8;border:1px solid #a9c8dd;border-radius:9px;color:#174868;padding:9px 11px;font-weight:650;cursor:grab;touch-action:none;user-select:none}.part.selected{background:#c4e4f7;outline:2px solid #247bb4}.part.done{background:#e6f5e8;border-color:#86bb92;color:#2d6941;cursor:default}.part:focus-visible,button:focus-visible{outline:3px solid #e69a19}.lab{width:100%;height:auto;display:block;border:1px solid #dce7ef;border-radius:10px;background:linear-gradient(#f9fcff,#eaf2f8)}.slot{fill:#c6d9e7;fill-opacity:.13;stroke:#7dabc8;stroke-width:2;stroke-dasharray:7 6;cursor:pointer}.slot.active{pointer-events:none;stroke:#ec9c2d;stroke-width:3;fill:#f7d895;fill-opacity:.22}.slot.done{display:none}.slot[data-zone=ring]{opacity:0}.slot[data-zone=ring].active{opacity:1}.controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:13px 0}button{background:#1e628d;color:white;border:0;border-radius:8px;padding:10px 13px;font-weight:650;cursor:pointer}button.secondary{background:#e2edf5;color:#204d6b}button:disabled{opacity:.4;cursor:not-allowed}.status{min-height:34px;padding:8px 10px;background:#f2f7fb;border-radius:8px;font-size:14px}.readouts{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}.pill{padding:8px 12px;border-radius:8px;background:#f1f6fb;font-weight:700}.blue{color:#146cbd}.red{color:#c6473e}.chart-legend{display:flex;gap:20px;flex-wrap:wrap;padding:10px 12px;background:#f4f8fb;border:1px solid #dce8f0;border-radius:8px;font-size:14px;font-weight:600;margin-bottom:10px}.swatch{display:inline-block;width:24px;border-top:4px solid;vertical-align:middle;margin-right:7px}canvas{display:block;width:100%;height:340px}select{padding:7px;border:1px solid #b7cbd9;border-radius:7px}details{margin-top:15px}summary{cursor:pointer;font-weight:650}table{border-collapse:collapse;width:100%;font-size:12px;margin-top:8px}#values{min-width:820px} .table-scroll{overflow-x:auto}td,th{border:1px solid #d7e2eb;padding:5px 7px;text-align:center}.ring-mini{width:92px;height:53px;display:block;pointer-events:none}.ring-part{display:inline-flex;align-items:center;gap:7px}.ring-ghost{background:transparent!important;border:0!important;box-shadow:none!important;padding:0!important}.ring-ghost .ring-mini{width:180px;height:110px;filter:drop-shadow(0 8px 6px #16354b55)}.ghost{position:fixed;z-index:1000;pointer-events:none;background:#d7efff;border:2px solid #2579ac;border-radius:8px;padding:10px;font-weight:700;box-shadow:0 6px 18px #0003}.helper{font-size:13px;color:#536f83;margin:6px 0}.waterline{stroke:#6fb1d4;stroke-width:2}.particle{pointer-events:none}.freeze{pointer-events:none}.tooltip{font-size:12px;fill:#456377}
+
+.molecular{margin-top:18px}.molecular[hidden]{display:none}.molecular-grid{display:grid;grid-template-columns:minmax(300px,1.5fr) minmax(230px,1fr);gap:16px}@media(max-width:780px){.molecular-grid{grid-template-columns:1fr}}.molecule-stage{background:linear-gradient(135deg,#0c2743,#174f74);border-radius:12px;overflow:hidden;position:relative}.molecule-stage canvas{height:350px;display:block;width:100%;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}.molecule-controls{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.molecule-controls button[aria-pressed=true]{background:#12446c;box-shadow:inset 0 0 0 2px #8ccaff}.molecule-legend{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;margin:9px 0}.molecule-legend span{display:inline-flex;align-items:center;gap:6px}.dot{width:12px;height:12px;border-radius:50%;display:inline-block}.hbline{width:26px;border-top:3px dashed #83d8ff}.insight{padding:13px;background:#eef6fc;border-left:4px solid #438cb8;border-radius:7px;line-height:1.55}.molecular .helper{margin-top:12px}.help-card{margin:9px 0;padding:10px 13px;border:1px solid #b8d2e5;border-radius:9px;background:#f8fbfe}.help-card summary{cursor:pointer;font-weight:650;color:#174a70}.help-card[open] summary{margin-bottom:10px}.help-card p{line-height:1.55;margin:6px 0}.help-card .insight{margin-top:8px}
+#slots{display:none!important}
+.sim-tabs{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 16px}.sim-tabs button{flex:1;min-width:180px;padding:13px 15px;border-radius:10px;font-size:15px;font-weight:700;background:#e5eff6;color:#173d5b;border:2px solid #b8cfdf;cursor:pointer}.sim-tabs button[aria-selected="true"]{background:#173d5b;color:white;border-color:#173d5b}.sim-tabs button:disabled{opacity:.55;cursor:not-allowed}.sim-panel[hidden]{display:none!important}
+</style></head><body><header><h1>Hopesches Experiment – Dichteanomalie des Wassers</h1><p>Versuch selbst aufbauen, befüllen und Temperaturverlauf beobachten</p></header><main><nav class="sim-tabs" aria-label="Bereiche der Simulation" role="tablist"><button id="tabExperiment" type="button" role="tab" aria-controls="experimentPanel" aria-selected="true">1 · Hopescher Versuch</button><button id="tabMolecular" type="button" role="tab" aria-controls="molecular" aria-selected="false" disabled>2 · Teilchenebene 🔒</button></nav><div id="experimentPanel" class="sim-panel" role="tabpanel" aria-labelledby="tabExperiment"><div class="layout"><section><h2>1 · Versuchsaufbau</h2><p class="helper">Ziehe die Bauteile auf die Apparatur. Starte anschließend die Simulation.</p><div class="parts" id="parts"></div><svg class="lab" id="lab" viewBox="0 0 600 600" aria-label="Interaktive Hopesche Apparatur mit Einsetzpositionen"><defs><linearGradient id="steel" x1="0" x2="1"><stop stop-color="#667783"/><stop offset=".18" stop-color="#edf4f7"/><stop offset=".48" stop-color="#9baeb9"/><stop offset=".8" stop-color="#dbe5eb"/><stop offset="1" stop-color="#607785"/></linearGradient><linearGradient id="glass" x1="0" x2="1"><stop stop-color="#eaf8ff" stop-opacity=".66"/><stop offset=".25" stop-color="#fff" stop-opacity=".09"/><stop offset=".73" stop-color="#fff" stop-opacity=".05"/><stop offset="1" stop-color="#9ac3dc" stop-opacity=".55"/></linearGradient><linearGradient id="waterGrad" x1="0" x2="0" y1="0" y2="1"><stop stop-color="#d6f5ff" stop-opacity=".62"/><stop offset="1" stop-color="#68b4df" stop-opacity=".5"/></linearGradient><clipPath id="waterclip"><rect x="241" y="79" width="116" height="436" rx="3"/></clipPath><linearGradient id="metalDark" x1="0" x2="1"><stop stop-color="#425768"/><stop offset=".12" stop-color="#aabcc7"/><stop offset=".28" stop-color="#e7f1f4"/><stop offset=".53" stop-color="#718a9a"/><stop offset=".78" stop-color="#dce9ed"/><stop offset="1" stop-color="#4d6474"/></linearGradient><linearGradient id="glassBody" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#7db1cf" stop-opacity=".42"/><stop offset=".09" stop-color="#fff" stop-opacity=".8"/><stop offset=".23" stop-color="#e8f9ff" stop-opacity=".17"/><stop offset=".75" stop-color="#e7f8ff" stop-opacity=".08"/><stop offset=".9" stop-color="#fff" stop-opacity=".62"/><stop offset="1" stop-color="#6b9ebc" stop-opacity=".5"/></linearGradient><linearGradient id="rim" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#f9fdff"/><stop offset=".35" stop-color="#a2b8c5"/><stop offset="1" stop-color="#465e70"/></linearGradient><linearGradient id="troughWater" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#d9f3ff"/><stop offset="1" stop-color="#8ebacb"/></linearGradient><mask id="mantleCutaway" maskUnits="userSpaceOnUse" x="160" y="220" width="280" height="180"><rect x="160" y="220" width="280" height="180" fill="white"/><rect x="234" y="220" width="130" height="180" fill="black"/></mask></defs>
+<rect x="36" y="554" width="525" height="12" rx="5" fill="#c6d6e1" opacity=".6"/><g id="stand" style="display:none"><rect x="92" y="536" width="400" height="22" rx="5" fill="url(#steel)"/><rect x="116" y="53" width="14" height="482" rx="3" fill="url(#steel)"/><rect x="126" y="120" width="125" height="9" rx="3" fill="url(#steel)"/><rect x="126" y="459" width="125" height="9" rx="3" fill="url(#steel)"/><rect x="115" y="112" width="28" height="25" rx="4" fill="#6c8494"/><rect x="115" y="452" width="28" height="25" rx="4" fill="#6c8494"/></g>
+<g id="ringRear" style="display:none" aria-label="Hinterer Teil des Kühlmantels">
+<!-- Der Glaszylinder und die ringförmige Wanne haben dieselbe Mittelachse x=299. -->
+<path d="M174 267 C174 246 230 235 299 235 C368 235 424 246 424 267 L424 340 C424 359 368 373 299 373 C230 373 174 359 174 340 Z" fill="url(#metalDark)" stroke="#496474" stroke-width="2"/>
+<path d="M174 267 C174 246 230 235 299 235 C368 235 424 246 424 267" fill="none" stroke="#f3fbff" stroke-width="4"/>
+</g>
+<g id="cylinder" style="display:none" aria-label="Hoher Glaszylinder mit sichtbarer Wandstärke"><rect x="235" y="62" width="128" height="465" rx="8" fill="url(#glassBody)" stroke="#7e9eb2" stroke-width="3"/><rect x="241" y="76" width="116" height="444" rx="3" fill="#e8f7ff" fill-opacity=".11" stroke="#d8edf7" stroke-opacity=".75" stroke-width="1.3"/><path d="M242 79 L242 511" stroke="#fff" stroke-width="4" opacity=".63"/><path d="M354 80 L354 512" stroke="#fff" stroke-width="3" opacity=".48"/><ellipse cx="299" cy="63" rx="64" ry="9" fill="#f7fdff" fill-opacity=".5" stroke="#7099b0" stroke-width="3"/><ellipse cx="299" cy="64" rx="58" ry="5" fill="#b8d7e8" fill-opacity=".18" stroke="#d6eaf5" stroke-width="1.5"/><ellipse cx="299" cy="520" rx="62" ry="6" fill="none" stroke="#7fa4ba" stroke-width="2"/></g>
+<g id="waterGroup" clip-path="url(#waterclip)" style="display:none"><rect x="241" y="90" width="116" height="430" fill="url(#waterGrad)"/><path id="surface" d="M241 90 Q270 87 299 90 T357 90" fill="none" class="waterline"/><g id="particles"></g><g id="ice"></g></g>
+<g id="ring" style="display:none" aria-label="Ringförmiger Kühlmantel, der den Glaszylinder konzentrisch umschließt">
+<!-- Beide Bauteile haben dieselbe senkrechte Mittelachse x=299. Die hintere Hälfte liegt hinter dem Glaszylinder; die vordere Hälfte verdeckt ihn wie bei einer echten geschlossenen ringförmigen Kühlwanne. -->
+<g id="saltice" mask="url(#mantleCutaway)"></g>
+<!-- Runde vordere Metallwand: konzentrische Ellipsen, wie eine ringförmige Wanne -->
+<path d="M174 267 C174 291 230 303 299 303 C368 303 424 291 424 267 L424 340 C424 366 368 379 299 379 C230 379 174 366 174 340 Z" fill="url(#metalDark)" stroke="#455e70" stroke-width="3"/>
+<!-- Oberer vorderer Rand als Ellipsenbogen -->
+<path d="M174 267 C174 291 230 303 299 303 C368 303 424 291 424 267" fill="none" stroke="#edf7fb" stroke-width="4"/>
+<!-- Schmale Reflexe links und rechts, ohne die Zylinderachse zu verschieben -->
+<path d="M181 286 L181 335" stroke="#e2f4fd" stroke-width="3" opacity=".52"/>
+<path d="M416 286 L416 335" stroke="#243f51" stroke-width="3" opacity=".45"/>
+</g>
+<g id="upper" style="display:none"><rect x="308" y="153" width="214" height="14" rx="6" fill="#f6f5ee" stroke="#718694" stroke-width="2"/><rect x="325" y="159" width="189" height="3" rx="1.5" fill="#e0e9ef"/><rect id="upperFluid" x="325" y="159" width="189" height="3" rx="1.5" fill="#146cbd"/><circle cx="307" cy="160" r="7" fill="#146cbd" stroke="#cbd6da" stroke-width="2"/><text x="455" y="145" fill="#146cbd" font-size="14" font-weight="700">T₁ oben</text><rect x="448" y="170" width="75" height="26" rx="7" fill="#fff" stroke="#146cbd" stroke-width="1.4"/><text id="upperDisplay" x="485" y="188" font-size="15" font-weight="700" text-anchor="middle" fill="#146cbd">12,0 °C</text></g>
+<g id="lower" style="display:none"><rect x="308" y="438" width="214" height="14" rx="6" fill="#f6f5ee" stroke="#718694" stroke-width="2"/><rect x="325" y="444" width="189" height="3" rx="1.5" fill="#e0e9ef"/><rect id="lowerFluid" x="325" y="444" width="189" height="3" rx="1.5" fill="#c6473e"/><circle cx="307" cy="445" r="7" fill="#c6473e" stroke="#cbd6da" stroke-width="2"/><text x="455" y="429" fill="#c6473e" font-size="14" font-weight="700">T₂ unten</text><rect x="448" y="455" width="75" height="26" rx="7" fill="#fff" stroke="#c6473e" stroke-width="1.4"/><text id="lowerDisplay" x="485" y="473" font-size="15" font-weight="700" text-anchor="middle" fill="#c6473e">12,0 °C</text></g>
+<g id="ringLabel" style="display:none"><text x="445" y="302" class="tooltip">Kühlmantel</text><text x="445" y="318" class="tooltip">(Eis + Salz)</text></g><g id="slots"><rect class="slot" data-zone="stand" x="90" y="48" width="46" height="510" rx="8"/><rect class="slot" data-zone="cylinder" x="235" y="62" width="128" height="465" rx="8"/><rect class="slot" data-zone="ring" x="172" y="258" width="254" height="105" rx="9"/><rect class="slot" data-zone="upper" x="306" y="152" width="218" height="17" rx="6"/><rect class="slot" data-zone="lower" x="306" y="437" width="218" height="17" rx="6"/><rect class="slot" data-zone="water" x="247" y="85" width="104" height="150" rx="9"/><rect class="slot" data-zone="mixture" x="180" y="271" width="47" height="74" rx="7"/></g></svg>
+<div id="status" class="status" role="status">Beginne mit dem Stativ. Danach folgen Glaszylinder, Kühlmantel und Thermometer.</div><div class="readouts"><div class="pill">Wasser im Zylinder: ca. 500 mL</div><div class="pill blue">T₁ oben: <span id="up">12,0</span> °C</div><div class="pill red">T₂ unten: <span id="down">12,0</span> °C</div></div><div class="controls"><button id="start" disabled>▶ Versuch starten</button><button id="pause" class="secondary" disabled>⏸ Pause</button><button id="reset" class="secondary">↺ Alles zurücksetzen</button></div></section>
+<section><h2>2 · Temperatur-Zeit-Diagramm</h2><div class="chart-legend"><span><i class="swatch" style="border-color:#146cbd"></i>Oberes Thermometer T₁</span><span><i class="swatch" style="border-color:#c6473e"></i>Unteres Thermometer T₂</span></div><canvas id="plot" aria-label="Temperatur-Zeit-Diagramm mit zwei Graphen"></canvas><div class="controls"><label for="speed">Geschwindigkeit:</label><select id="speed"><option value="1">1×</option><option value="3" selected>3×</option><option value="8">8×</option><option value="20">20×</option></select><strong id="clock">0,0 min</strong></div></section></div></div><section class="molecular sim-panel" id="molecular" role="tabpanel" aria-labelledby="tabMolecular" hidden><h2>3 · Blick auf die Teilchenebene</h2><p class="helper">Untersuche die Molekülanordnung und -bewegung. Nutze bei Bedarf die aufklappbaren Hilfekarten.</p><div class="molecular-grid"><div><div class="molecule-controls"><button data-temp="12" aria-pressed="false">Wasser · 12 °C</button><button data-temp="4" aria-pressed="true">Wasser · 4 °C</button><button data-temp="0" aria-pressed="false">Eis · 0 °C</button></div><div class="molecule-stage" style="touch-action:none"><canvas id="moleculeCanvas" aria-label="Animierte schematische Darstellung von Wassermolekülen und Wasserstoffbrücken"></canvas></div><p class="helper">Im Eis zeigen die gelben Punkte die Richtung freier Elektronenpaare; gestrichelte Linien verbinden Wasserstoff-Atome mit diesen Elektronenpaaren. Drehe das Eisgitter mit einem Finger oder der Maus. Vergrößere und verkleinere die Ansicht mit zwei Fingern, dem Mausrad oder den Zoom-Tasten. Ein Doppeltippen oder Doppelklick setzt die Ansicht zurück.</p><div class="molecule-controls"><button id="zoomOutMol" class="secondary" type="button" aria-label="Teilchenansicht verkleinern">− Zoom</button><button id="zoomInMol" class="secondary" type="button" aria-label="Teilchenansicht vergrößern">+ Zoom</button><button id="resetView" class="secondary">Ansicht zurücksetzen</button><button id="pauseMolecules" class="secondary">Teilchenbewegung pausieren</button><button id="toggleLayers" class="secondary" aria-pressed="true">Alle Schichten anzeigen</button></div><div class="molecule-legend"><span><i class="dot" style="background:#ed6666"></i>Sauerstoff</span><span><i class="dot" style="background:#f4f8ff;border:1px solid #a4b4c8"></i>Wasserstoff</span><span><i class="hbline"></i>Wasserstoffbrücke</span><span><i class="dot" style="background:#ffd96b"></i>Freies Elektronenpaar (Richtung)</span></div><label><input id="showHB" type="checkbox" checked> Wasserstoffbrücken anzeigen</label><p class="note">Fachliche Orientierung: <a href="https://www.leifichemie.de/einfuehrung-die-chemie/stoffeigenschaften/grundwissen/dichteanomalie-des-wassers" target="_blank" rel="noopener">LEIFIchemie – Dichteanomalie des Wassers</a>. Die Animation ist eine eigenständige schematische Umsetzung. Der Unterschied der Molekülabstände zwischen 4 °C und 12 °C ist zur besseren Erkennbarkeit bewusst überhöht dargestellt; tatsächlich beträgt die Volumenänderung nur etwa 0,05 %.</p></div><div><h2 id="molTitle">Flüssiges Wasser bei 4 °C</h2><p id="molDescription" hidden></p><h3>Abgestufte Hilfekarten zum Arbeitsblatt</h3><p class="helper">Bearbeitet zuerst die Aufgaben selbstständig. Öffnet bei Bedarf zunächst Tipp 1 und erst danach Tipp 2. Die Hilfen verraten nicht die vollständige Lösung.</p>
+<div class="help-group"><h4>Aufgabe 1 · Temperaturansichten zuordnen</h4>
+<details class="help-card"><summary>Aufgabe 1 · Tipp 1: Worauf solltest du achten?</summary><p>Vergleiche die Abstände und die Anordnung der Wassermoleküle. Wo erkennst du eine regelmäßige Struktur? Wo liegen die Moleküle besonders dicht beieinander?</p></details>
+<details class="help-card"><summary>Aufgabe 1 · Tipp 2: Wie helfen die Aggregatzustände?</summary><p>Im festen Zustand sind die Wassermoleküle an feste Plätze in einem räumlichen Gitter gebunden. In flüssigem Wasser bewegen sie sich ungeordnet. Vergleiche bei den beiden flüssigen Ansichten die mittleren Molekülabstände.</p></details></div>
+<div class="help-group"><h4>Aufgabe 2 · Zuordnung begründen</h4>
+<details class="help-card"><summary>Aufgabe 2 · Tipp 1: Was bedeuten die gestrichelten Linien?</summary><p>Aktiviere „Wasserstoffbrücken anzeigen“. Die gestrichelten Linien stellen Anziehungskräfte zwischen benachbarten Wassermolekülen dar. Beobachte, ob die Verbindungen dauerhaft angeordnet sind oder sich verändern.</p></details>
+<details class="help-card"><summary>Aufgabe 2 · Tipp 2: Warum unterscheiden sich Eis und Wasser?</summary><p>Drehe das Eisgitter. Achte auf die Hohlräume und die räumliche Verknüpfung der Moleküle. Vergleiche das mit der beweglichen Anordnung bei 4 °C. Überlege: Was bedeutet ein größeres Volumen bei gleicher Masse für die Dichte?</p></details></div>
+<div class="help-group"><h4>Aufgabe 3 · Findus' Behauptung beurteilen (AFB III)</h4>
+<details class="help-card"><summary>Aufgabe 3 · Tipp 1: Welche Aussage musst du überprüfen?</summary><p>Findus setzt starke Anziehungskräfte mit einer besonders dichten Anordnung gleich. Prüfe, ob das Eisgitter trotz Wasserstoffbrücken eher eng oder offen aufgebaut ist.</p></details>
+<details class="help-card"><summary>Aufgabe 3 · Tipp 2: So kannst du deine Beurteilung aufbauen</summary><p>1. Entscheide, ob die Behauptung stimmt. 2. Erläutere kurz die Wasserstoffbrücken. 3. Vergleiche ihre Wirkung auf die Anordnung bei 4 °C und im Eis. 4. Ziehe daraus ein begründetes Urteil.</p></details></div>
+<button id="backExperiment" class="secondary">↑ Zur Apparatur</button></div></div></section></main><script>
+const $=id=>document.getElementById(id);
+function showTab(which){
+ const isMol=which==='molecular';
+ if(isMol && $('tabMolecular').disabled)return;
+ $('experimentPanel').hidden=isMol;
+ $('molecular').hidden=!isMol;
+ $('tabExperiment').setAttribute('aria-selected',String(!isMol));
+ $('tabMolecular').setAttribute('aria-selected',String(isMol));
+ if(isMol){requestAnimationFrame(()=>{window.dispatchEvent(new Event('resize'));});}
+ window.scrollTo({top:0,behavior:'smooth'});
+}
+$('tabExperiment').addEventListener('click',()=>showTab('experiment'));
+$('tabMolecular').addEventListener('click',()=>showTab('molecular'));
+const names={stand:'Stativ',cylinder:'Glaszylinder',ring:'Ringförmiger Kühlmantel',upper:'Oberes Thermometer',lower:'Unteres Thermometer',water:'Wasser einfüllen',mixture:'Eis-Salz-Mischung einfüllen'};const order=['stand','cylinder','ring','upper','lower','water','mixture'];const deps={stand:[],cylinder:['stand'],ring:['cylinder'],upper:['cylinder'],lower:['cylinder'],water:['cylinder','upper','lower'],mixture:['ring','water']};let installed=new Set(),selected=null,t=0,playing=false,last=0,drag=null;const data=[[0,12,12],[5,9.5,11.9],[10,7.7,11.7],[15,6.3,11],[20,5.1,10],[25,4.5,6.5],[30,4,2.5],[35,4,0],[40,4,0],[45,4,0]];
+function allowed(k){return deps[k].every(v=>installed.has(v));}function say(s){$('status').textContent=s;}function palette(){const p=$('parts');p.innerHTML='';for(const k of order){let b=document.createElement('button');b.className='part'+(installed.has(k)?' done':'')+(selected===k?' selected':'');b.textContent=(installed.has(k)?'✓ ':'')+names[k];b.disabled=installed.has(k);b.dataset.key=k;b.addEventListener('pointerdown',startDrag);b.addEventListener('click',()=>{if(!installed.has(k)){selected=k;palette();highlight();say('Setze „'+names[k]+'“ an der passenden Position ein.');}});p.append(b);}}
+function highlight(){document.querySelectorAll('.slot').forEach(el=>{el.classList.toggle('done',installed.has(el.dataset.zone));el.classList.toggle('active',selected===el.dataset.zone);});}function install(k){if(installed.has(k))return;if(!allowed(k)){say('Noch nicht möglich: Baue zuerst '+deps[k].filter(v=>!installed.has(v)).map(v=>names[v]).join(' und ')+' ein.');return;}installed.add(k);selected=null;if(k==='water')$('waterGroup').style.display='';else if(k==='mixture')fillMixture();else $(k).style.display='';if(k==='ring'){ $('ringRear').style.display='';$('ringLabel').style.display=''; }palette();highlight();if(installed.size===order.length){$('start').disabled=false;say('Aufbau vollständig! Starte jetzt die Kühlung und beobachte beide Thermometer.');}else say(names[k]+' eingesetzt. Wähle das nächste Bauteil.');draw();}
+// Große Zielzone: Die gesamte Apparatur ist eine gültige Ablagefläche.
+// Zusätzlich funktioniert erst Bauteil anklicken, dann beliebige Stelle der Apparatur anklicken.
+$('lab').addEventListener('click',e=>{if(selected&&!drag)install(selected);});
+function startDrag(e){
+ if(e.button!==0&&e.pointerType==='mouse')return;
+ const key=e.currentTarget.dataset.key;if(installed.has(key))return;
+ selected=key;highlight();
+ const ghost=document.createElement('div');ghost.className='ghost';ghost.textContent=names[key];document.body.append(ghost);
+ drag={key,ghost,originX:e.clientX,originY:e.clientY,moved:false};moveGhost(e);
+ // Kein Pointer-Capture: Sonst wird das Loslassen auf dem SVG nicht erkannt.
+}
+function moveGhost(e){if(!drag)return;drag.ghost.style.left=e.clientX+15+'px';drag.ghost.style.top=e.clientY+12+'px';if(Math.hypot(e.clientX-drag.originX,e.clientY-drag.originY)>7)drag.moved=true;}
+document.addEventListener('pointermove',moveGhost);
+document.addEventListener('pointerup',e=>{
+ if(!drag)return;const d=drag;d.ghost.remove();drag=null;
+ if(!d.moved)return;
+ const box=$('lab').getBoundingClientRect();
+ const margin=32;
+ if(e.clientX>=box.left-margin&&e.clientX<=box.right+margin&&e.clientY>=box.top-margin&&e.clientY<=box.bottom+margin){install(d.key);}
+ else{selected=d.key;palette();highlight();say('Ziehe das Bauteil auf die Apparatur oder klicke es an und anschließend auf die Abbildung.');}
+});
+function fillMixture(){
+ const g=$('saltice');
+ let pieces='';
+ // Das Eis liegt als dicht gepackte, zusammenhängende Schüttung in der Ringwanne.
+ // Die hinteren Bereiche werden vom Zylinder, die unteren von der Metallwand verdeckt.
+ // Eine flache Eis-Salz-Sole verbindet die Bruchstücke optisch am Wannenboden.
+ pieces+=`<path d="M177 266 Q202 249 231 256 L231 292 Q201 295 177 279 Z" fill="#bad8e6" opacity=".94"/>`;
+ pieces+=`<path d="M367 256 Q394 248 421 266 L421 279 Q395 295 367 292 Z" fill="#bad8e6" opacity=".94"/>`;
+ // Mehrere dicht aufeinander liegende Lagen; kleine Kristalle füllen die Lücken.
+ for(let side=0;side<2;side++){
+   const left=side===0?178:368, right=side===0?230:420;
+   for(let layer=0;layer<3;layer++){
+     const count=layer===0?11:10;
+     for(let i=0;i<count;i++){
+       const step=(right-left-8)/(count-1);
+       const x=left+4+i*step+(Math.sin(i*2.7+layer*4.1)*2.1);
+       // Unten gestapelte Eisstücke tragen die oberen; keine frei schwebenden Stücke.
+       const y=281-layer*8+Math.sin(i*1.9+layer)*2.2;
+       const r=4.4+((i*3+layer*5)%5)*.65;
+       const fill=['#f6fcff','#d9eff8','#b9dbea','#e9f7fc'][(i+layer)%4];
+       pieces+=`<path d="M${(x-r).toFixed(1)} ${(y+1).toFixed(1)} L${(x-r*.8).toFixed(1)} ${(y-r*.65).toFixed(1)} L${(x-r*.1).toFixed(1)} ${(y-r*1.05).toFixed(1)} L${(x+r*.72).toFixed(1)} ${(y-r*.55).toFixed(1)} L${(x+r).toFixed(1)} ${(y+r*.38).toFixed(1)} L${(x+r*.2).toFixed(1)} ${(y+r*.7).toFixed(1)} Z" fill="${fill}" fill-opacity=".98" stroke="#8fbacb" stroke-width=".8"/>`;
+       pieces+=`<path d="M${(x-r*.68).toFixed(1)} ${(y-r*.43).toFixed(1)} L${(x-r*.1).toFixed(1)} ${(y-r*.8).toFixed(1)} L${(x+r*.35).toFixed(1)} ${(y-r*.5).toFixed(1)}" fill="none" stroke="#fff" stroke-width="1.15" opacity=".8"/>`;
+     }
+   }
+   // Feines, weißes Salzkorn liegt zwischen und auf den Eisstücken.
+   for(let i=0;i<85;i++){
+     const x=left+3+((i*29+7)%(right-left-6));
+     const y=253+((i*13+Math.floor(i/5)*3)%25);
+     const r=.35+(i%4)*.19;
+     pieces+=`<circle cx="${x}" cy="${y}" r="${r}" fill="${i%5===0?'#e2e8eb':'#fff'}" opacity=".93"/>`;
+   }
+ }
+ g.innerHTML=pieces;
+}
+const particles=Array.from({length:44},(_,i)=>({x:246+(i*37%104),y:105+(i*53%395),phase:i*1.7}));
+// Eis entsteht nur, wenn die obere Wasserschicht 0 °C erreicht hat.
+// Die Kristallbildung ist eine didaktische Visualisierung: reale Keimbildung
+// hängt auch von Unterkühlung, Wärmefluss und Kristallisationskeimen ab.
+function iceGrowth(){
+ const topTemp=interp(t,2);
+ if(!installed.has('water')||!installed.has('mixture')||topTemp>0.001)return 0;
+ return Math.min(1,Math.max(0,(t-35)/7));
+}
+function crystalBranch(x,y,angle,len,depth){
+ const x2=x+Math.cos(angle)*len,y2=y+Math.sin(angle)*len;
+ let out=`<path d="M${x.toFixed(1)} ${y.toFixed(1)} L${x2.toFixed(1)} ${y2.toFixed(1)}" fill="none" stroke="#f8feff" stroke-width="${Math.max(0.8,2.5-depth*.48)}" stroke-linecap="round"/>`;
+ if(depth<2){for(const sign of [-1,1])out+=crystalBranch(x2,y2,angle+sign*Math.PI/3,len*.51,depth+1);}
+ return out;
+}
+function animateWater(now){
+ if(!installed.has('water'))return;
+ const upper=interp(t,2),lower=interp(t,1),growth=iceGrowth();
+ const activity=playing?Math.max(.08,upper/12):0;
+ let str='';
+ for(let i=0;i<particles.length;i++){
+  const p=particles[i];let yy=p.y,xx=p.x;
+  if(playing){xx+=(Math.sin(p.phase+now*.00065)*9+Math.cos(p.phase*.6+now*.0004)*6)*activity;
+   yy+=Math.sin(p.phase+now*.0008)*6*activity;}
+  // Kristalle verdrängen die beweglichen Wassertracer im oberen Bereich.
+  if(growth>0 && yy<92+growth*17)continue;
+  str+=`<circle class="particle" cx="${Math.max(245,Math.min(352,xx)).toFixed(1)}" cy="${Math.max(94,Math.min(511,yy)).toFixed(1)}" r="${1.5+i%3*.6}" fill="#ffffff" opacity="${.18+i%4*.09}"/>`;
+ }
+ $('particles').innerHTML=str;
+ let ice='';
+ if(growth>0){
+  // Eisdecke wächst an der kalten oberen Oberfläche und an den oberen Innenwänden.
+  const depth=2+growth*16;
+  ice+=`<path d="M241 91 Q252 ${90+growth*3} 263 91 Q277 ${88+growth*3} 289 91 Q305 ${89+growth*4} 322 91 Q343 ${88+growth*2} 357 91 L357 ${91+depth} Q343 ${91+depth-2} 329 ${91+depth+1} Q314 ${91+depth-2} 300 ${91+depth} Q284 ${91+depth+3} 267 ${91+depth} Q254 ${91+depth-2} 241 ${91+depth} Z" fill="#e9faff" fill-opacity="${(.58+growth*.33).toFixed(2)}" stroke="#a3d7ed" stroke-width="1.1"/>`;
+  // Unregelmäßige, verzweigte Eiskristalle: kein plötzlich erscheinender Block.
+  for(let j=0;j<12;j++){
+   const x=248+j*9.3,y=94+(j%3)*2;
+   const len=growth*(4+(j%4)*2.2);
+   if(len>1)ice+=crystalBranch(x,y,Math.PI/2+Math.sin(j*2)*.24,len,0);
+  }
+  // Eis kann an der gekühlten Glasinnenwand im Bereich des Mantels ansetzen.
+  // Dieser Bereich wird durch die Metallwanne zum Teil verdeckt.
+  for(let j=0;j<13;j++){
+   const y=270+j*5.7, side=j%2===0;
+   const x=side?243:355,dir=side?0:Math.PI;
+   ice+=crystalBranch(x,y,dir+Math.sin(j*3)*.2,growth*(2+j%4*1.4),0);
+  }
+ }
+ $('ice').innerHTML=ice;
+}
+
+function interp(time,col){for(let i=1;i<data.length;i++){if(time<=data[i][0]){let a=data[i-1],b=data[i],f=(time-a[0])/(b[0]-a[0]);return a[col]+(b[col]-a[col])*f;}}return data[data.length-1][col];}
+const canvas=$('plot'),ctx=canvas.getContext('2d');function draw(){
+const w=Math.max(340,canvas.getBoundingClientRect().width),h=340,dpr=Math.min(2,window.devicePixelRatio||1);
+canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);
+const l=77,r=w-19,top=18,bottom=h-58,X=v=>l+(r-l)*v/45,Y=v=>bottom-(bottom-top)*v/12;
+ctx.font='12px system-ui, sans-serif';ctx.fillStyle='#526a7e';ctx.textAlign='right';
+for(let v=0;v<=12;v+=2){let y=Y(v);ctx.beginPath();ctx.moveTo(l,y);ctx.lineTo(r,y);ctx.strokeStyle='#dfe8ef';ctx.lineWidth=1;ctx.stroke();ctx.fillText(String(v),l-10,y+4);}
+ctx.textAlign='center';for(let v=0;v<=45;v+=5){let x=X(v);ctx.beginPath();ctx.moveTo(x,top);ctx.lineTo(x,bottom);ctx.strokeStyle='#edf2f6';ctx.stroke();ctx.fillText(String(v),x,bottom+19);}
+ctx.strokeStyle='#7992a2';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(l,top);ctx.lineTo(l,bottom);ctx.lineTo(r,bottom);ctx.stroke();
+ctx.font='600 13px system-ui, sans-serif';ctx.fillStyle='#294f68';ctx.textAlign='center';
+ctx.fillText('Zeit t in min',(l+r)/2,h-15);
+ctx.save();ctx.translate(22,(top+bottom)/2);ctx.rotate(-Math.PI/2);ctx.fillText('Temperatur T in °C',0,0);ctx.restore();
+if(installed.size===order.length){for(let [col,color] of [[2,'#146cbd'],[1,'#c6473e']]){
+ctx.strokeStyle=color;ctx.lineWidth=3;ctx.lineJoin='round';ctx.beginPath();ctx.moveTo(X(0),Y(interp(0,col)));
+for(let s=.12;s<=t;s+=.12)ctx.lineTo(X(s),Y(interp(s,col)));ctx.lineTo(X(t),Y(interp(t,col)));ctx.stroke();
+for(let p of data){if(p[0]>t)break;ctx.beginPath();ctx.arc(X(p[0]),Y(p[col]),3.5,0,Math.PI*2);ctx.fillStyle='white';ctx.fill();ctx.strokeStyle=color;ctx.lineWidth=2;ctx.stroke();}
+}}
+const upperTemp=interp(t,2),lowerTemp=interp(t,1);
+for(const [key,temp] of [['upper',upperTemp],['lower',lowerTemp]]){
+  const reading=temp.toFixed(1).replace('.',',')+' °C';
+  $(key+'Display').textContent=reading;
+  // Der Flüssigkeitsfaden wird kürzer, wenn die gemessene Temperatur sinkt.
+  $(key+'Fluid').setAttribute('width',(8+181*Math.max(0,Math.min(12,temp))/12).toFixed(2));
+}
+$('up').textContent=upperTemp.toFixed(1).replace('.',',');$('down').textContent=lowerTemp.toFixed(1).replace('.',',');$('clock').textContent=t.toFixed(1).replace('.',',')+' min';
+}
+$('start').onclick=()=>{if(installed.size!==order.length)return;if(t>=45)t=0;playing=true;$('pause').disabled=false;$('start').disabled=true;say('Versuch läuft: Beobachte die Temperaturverteilung und die Wasserbewegung.');};$('pause').onclick=()=>{playing=false;$('pause').disabled=true;$('start').disabled=false;say('Versuch pausiert.');};$('reset').onclick=()=>{playing=false;t=0;installed.clear();selected=null;for(let k of ['stand','cylinder','ring','ringRear','ringLabel','upper','lower','waterGroup'])$(k).style.display='none';$('saltice').innerHTML='';$('ice').innerHTML='';$('particles').innerHTML='';$('start').disabled=true;$('pause').disabled=true;$('molecular').hidden=true;$('tabMolecular').disabled=true;$('tabMolecular').textContent='2 · Teilchenebene 🔒';showTab('experiment');palette();highlight();say('Aufbau zurückgesetzt. Beginne mit dem Stativ.');draw();};function loop(now){let dt=last?Math.min(.08,(now-last)/1000):0;last=now;if(playing){t=Math.min(45,t+dt*Number($('speed').value)*.55);if(t===45){playing=false;$('start').disabled=false;$('pause').disabled=true;say('Versuch beendet. Jetzt kannst du die Teilchenebene untersuchen.');$('tabMolecular').disabled=false;$('tabMolecular').textContent='2 · Teilchenebene';say('Versuch beendet. Öffne nun den Reiter „Teilchenebene“.');}draw();}animateWater(now);requestAnimationFrame(loop);}window.addEventListener('resize',draw);palette();highlight();draw();requestAnimationFrame(loop);
+
+// Interaktive Teilchenebene: drehbare räumliche Projektion und vereinfachte Dynamik.
+const molCanvas=$('moleculeCanvas'),mctx=molCanvas.getContext('2d');
+const iceStartYaw=Math.PI/4,iceStartPitch=Math.asin(1/Math.sqrt(3));
+let molTemp=4,viewYaw=iceStartYaw,viewPitch=iceStartPitch,viewZoom=1,molPaused=false,showLayers=true,lastMolTime=0;
+const molDescriptions={
+ 12:'Wassermoleküle sind Dipolmoleküle: Das Sauerstoffatom trägt eine negative Partialladung (δ−), die Wasserstoffatome tragen positive Partialladungen (δ+). Zwischen den Molekülen entstehen Wasserstoffbrücken. Bei 12 °C bewegen sich die Moleküle etwas stärker als bei 4 °C. Wasserstoffbrücken lösen sich und bilden sich neu. Das Wasser hat eine etwas geringere Dichte als bei 4 °C.',
+ 4:'Bei etwa 4 °C hat Wasser seine größte Dichte. Die Wassermoleküle sind im Durchschnitt besonders dicht angeordnet. Sie bewegen sich weiterhin und bilden ständig neue Wasserstoffbrücken. Anders als im Eis gibt es kein festes Kristallgitter. Beim Abkühlen unter 4 °C nimmt die Dichte wieder ab.',
+ 0:'Beim Gefrieren ordnen sich die Wassermoleküle zu einem regelmäßigen Kristallgitter an. Wasserstoffbrücken halten die Moleküle in einer offenen, räumlichen Struktur mit Hohlräumen zusammen. Jedes Wassermolekül ist dabei mit vier Nachbarmolekülen verknüpft. Die Moleküle schwingen um ihre festen Plätze. Im Modell beträgt der O···O-Abstand 2,76 Å, der O–H-Abstand 0,96 Å. Weil das Gitter mehr Raum benötigt, ist Eis weniger dicht als flüssiges Wasser und schwimmt auf ihm.'};
+// Ideales tetraedrisches Netzwerk (Diamant-Topologie als geometrisches Modell).
+// Jeder innere Sauerstoff hat vier Nachbarn unter 109,47° und O···O = 2,76 Å.
+// Eis Ih ist hexagonal; die hier verwendete endliche Netzgeometrie ist ausdrücklich
+// eine tetraedrische Annäherung und kein exaktes kristallographisches Eis-Ih-Modell.
+const OO=2.76, OH=0.96, lattice=[],edges=[],edgeSet=new Set();
+const unit=OO*4/Math.sqrt(3);
+const basis=[[0,0,0],[0,.5,.5],[.5,0,.5],[.5,.5,0],[.25,.25,.25],[.25,.75,.75],[.75,.25,.75],[.75,.75,.25]];
+const siteMap=new Map();
+for(let ix=0;ix<2;ix++)for(let iy=0;iy<2;iy++)for(let iz=0;iz<2;iz++)for(const b of basis){
+ const x=(ix+b[0])*unit,y=(iy+b[1])*unit,z=(iz+b[2])*unit;
+ const id=lattice.length;lattice.push({x,y,z,phase:id*2.27,layer:iz});siteMap.set([x,y,z].map(v=>v.toFixed(5)).join(':'),id);
+}
+for(let i=0;i<lattice.length;i++)for(let j=i+1;j<lattice.length;j++){
+ const a=lattice[i],b=lattice[j],dist=Math.hypot(a.x-b.x,a.y-b.y,a.z-b.z);
+ if(Math.abs(dist-OO)<.001){edges.push([i,j]);edgeSet.add(i+':'+j);}
+}
+const adjacent=lattice.map(()=>[]);for(const [a,b] of edges){adjacent[a].push(b);adjacent[b].push(a);}
+// Vollständige Moleküle auch an den Grenzen des endlichen Kristallausschnitts:
+// vier tetraedrische Richtungen je Sauerstoff, davon genau zwei O–H und zwei EP.
+// Fehlende Nachbarn am Modellrand ändern NICHT die Vollständigkeit eines Moleküls.
+const tetraA=[[1,1,1],[1,-1,-1],[-1,1,-1],[-1,-1,1]];
+const tetraB=tetraA.map(v=>v.map(c=>-c));
+const tetraDirs=lattice.map((p,i)=>((i%8)<4?tetraA:tetraB).map(v=>v.map(c=>c/Math.sqrt(3))));
+const donor=lattice.map(()=>[]),acceptor=lattice.map(()=>[]);
+const edgeDirections=new Map();
+for(const [a,b] of edges){
+ const A=lattice[a],B=lattice[b],dx=(B.x-A.x)/OO,dy=(B.y-A.y)/OO,dz=(B.z-A.z)/OO;
+ const da=tetraDirs[a].findIndex(v=>v[0]*dx+v[1]*dy+v[2]*dz>.99);
+ const db=tetraDirs[b].findIndex(v=>v[0]*-dx+v[1]*-dy+v[2]*-dz>.99);
+ // Jeder Standort spendet entlang der ersten beiden Richtungen, akzeptiert entlang der übrigen.
+ // Auf den beiden Untergittern werden komplementäre Donor-Richtungen gewählt.
+ // Damit trägt jede O···O-Verbindung GENAU ein H-Atom: O–H···O.
+ const isDonor=(i,d)=>d>=0&&((i%8)<4?d<2:d>=2);
+ const from=isDonor(a,da)?a:b,to=from===a?b:a;
+ donor[from].push(to);acceptor[to].push(from);edgeDirections.set(a+':'+b,[from,to]);
+}
+function iceOffset(i,dir,distance){const p=lattice[i],v=tetraDirs[i][dir];return {x:p.x+v[0]*distance,y:p.y+v[1]*distance,z:p.z+v[2]*distance};}
+// Flüssigkeit: individuelle Geschwindigkeiten, Stoßabstoßung, Drift und Rotationsdiffusion.
+const N=54,liquid=Array.from({length:N},(_,i)=>({x:(i%9+.5)/9,y:(Math.floor(i/9)+.5)/6,vx:(Math.random()-.5)*.10,vy:(Math.random()-.5)*.10,theta:Math.random()*Math.PI*2,spin:(Math.random()-.5)*.7,phase:Math.random()*9}));
+function setMolTemp(v){if(v===0&&molTemp!==0){viewYaw=iceStartYaw;viewPitch=iceStartPitch;viewZoom=1;}molTemp=v;document.querySelectorAll('[data-temp]').forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.temp===v)));$('molTitle').textContent=v===0?'Eis bei 0 °C':`Flüssiges Wasser bei ${v} °C`;$('molDescription').textContent=molDescriptions[v];}
+document.querySelectorAll('[data-temp]').forEach(b=>b.addEventListener('click',()=>setMolTemp(+b.dataset.temp)));
+$('backExperiment').onclick=()=>showTab('experiment');
+$('resetView').onclick=()=>{viewYaw=iceStartYaw;viewPitch=iceStartPitch;viewZoom=1;};
+$('pauseMolecules').onclick=()=>{molPaused=!molPaused;$('pauseMolecules').textContent=molPaused?'Teilchenbewegung fortsetzen':'Teilchenbewegung pausieren';};
+$('toggleLayers').onclick=()=>{showLayers=!showLayers;$('toggleLayers').setAttribute('aria-pressed',String(showLayers));$('toggleLayers').textContent=showLayers?'Alle Schichten anzeigen':'Nur vordere Schicht';};
+// Einheitliche Pointer-Gesten für Maus, Touch und Stift. Zwei Finger: stufenloser Zoom.
+const activeMolPointers=new Map();
+let lastPinchDistance=null,lastTouchTap=0;
+const clampMolZoom=z=>Math.max(.65,Math.min(3.2,z));
+function pinchDistance(){const p=[...activeMolPointers.values()];return p.length<2?null:Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y);}
+function clearMolPointer(e){activeMolPointers.delete(e.pointerId);lastPinchDistance=pinchDistance();try{if(molCanvas.hasPointerCapture(e.pointerId))molCanvas.releasePointerCapture(e.pointerId);}catch(err){}}
+molCanvas.addEventListener('pointerdown',e=>{
+ if(e.pointerType==='touch')e.preventDefault();
+ activeMolPointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+ try{molCanvas.setPointerCapture(e.pointerId);}catch(err){}
+ lastPinchDistance=pinchDistance();
+ if(e.pointerType==='touch'&&activeMolPointers.size===1){const now=performance.now();if(now-lastTouchTap<330){$('resetView').click();lastTouchTap=0;}else lastTouchTap=now;}
+});
+molCanvas.addEventListener('pointermove',e=>{
+ const old=activeMolPointers.get(e.pointerId);if(!old)return;
+ if(e.pointerType==='touch')e.preventDefault();
+ activeMolPointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+ if(activeMolPointers.size>=2){const distance=pinchDistance();if(lastPinchDistance&&distance)viewZoom=clampMolZoom(viewZoom*distance/lastPinchDistance);lastPinchDistance=distance;return;}
+ if(molTemp===0){viewYaw+=(e.clientX-old.x)*.009;viewPitch=Math.max(-1.35,Math.min(1.35,viewPitch+(e.clientY-old.y)*.009));}
+});
+['pointerup','pointercancel','lostpointercapture'].forEach(type=>molCanvas.addEventListener(type,clearMolPointer));
+molCanvas.addEventListener('wheel',e=>{e.preventDefault();viewZoom=clampMolZoom(viewZoom*Math.exp(-e.deltaY*.001));},{passive:false});
+molCanvas.addEventListener('dblclick',()=>{$('resetView').click();});
+$('zoomInMol').addEventListener('click',()=>{viewZoom=clampMolZoom(viewZoom*1.25);});
+$('zoomOutMol').addEventListener('click',()=>{viewZoom=clampMolZoom(viewZoom/1.25);});
+function line(x1,y1,x2,y2,color,width=1.5,dash=[]){mctx.beginPath();mctx.strokeStyle=color;mctx.lineWidth=width;mctx.setLineDash(dash);mctx.moveTo(x1,y1);mctx.lineTo(x2,y2);mctx.stroke();mctx.setLineDash([]);}
+function circle(x,y,r,color){mctx.fillStyle=color;mctx.beginPath();mctx.arc(x,y,r,0,Math.PI*2);mctx.fill();}
+function molecule(p,angle1,angle2,shade=0){
+ const a={x:p.x+15*Math.cos(angle1),y:p.y+15*Math.sin(angle1)},b={x:p.x+15*Math.cos(angle2),y:p.y+15*Math.sin(angle2)};
+ line(p.x,p.y,a.x,a.y,'#e7eff7',3);line(p.x,p.y,b.x,b.y,'#e7eff7',3);
+ circle(p.x,p.y,8.3,shade?'#d45465':'#f36c70');circle(a.x,a.y,4.5,'#f7fcff');circle(b.x,b.y,4.5,'#f7fcff');return [a,b];
+}
+function updateLiquid(dt,hot){if(molPaused)return;const speed=hot?1.5:1,step=Math.min(.045,dt)*speed;
+ for(let i=0;i<N;i++){const p=liquid[i];p.vx+=(Math.random()-.5)*.09*step*22;p.vy+=(Math.random()-.5)*.09*step*22;p.vx*=.985;p.vy*=.985;
+  p.x+=p.vx*step;p.y+=p.vy*step;p.theta+=(p.spin+(Math.random()-.5)*.4)*step;
+  if(p.x<.035){p.x=.035;p.vx=Math.abs(p.vx);}if(p.x>.965){p.x=.965;p.vx=-Math.abs(p.vx);}
+  if(p.y<.05){p.y=.05;p.vy=Math.abs(p.vy);}if(p.y>.95){p.y=.95;p.vy=-Math.abs(p.vy);}
+ }
+ for(let i=0;i<N;i++)for(let j=i+1;j<N;j++){let a=liquid[i],b=liquid[j],dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy)||.0001;const target=hot?.089:.078;if(d<target){const f=(target-d)*.18;a.x-=dx/d*f;a.y-=dy/d*f;b.x+=dx/d*f;b.y+=dy/d*f;a.vx-=dx/d*f*.2;b.vx+=dx/d*f*.2;}}
+}
+function drawLiquid(w,h,dt,hot){updateLiquid(dt,hot);
+ // Vergrößerung erfolgt um die Bildmitte. Moleküle werden nur vollständig gezeichnet.
+ const pad=43,W=w-pad*2,H=h-pad*2;
+ // Didaktische Überhöhung: Bei 12 °C ist der mittlere Abstand optisch
+ // größer als bei 4 °C. Die tatsächliche Volumendifferenz beträgt nur ca. 0,05 %.
+ const separation=hot?1.14:1;
+ const pts=liquid.map(p=>({x:w/2+(p.x-.5)*W*viewZoom*separation,y:h/2+(p.y-.5)*H*viewZoom*separation,theta:p.theta}));
+ const complete=p=>p.x>=27&&p.x<=w-27&&p.y>=27&&p.y<=h-27;
+ // Wasserstoffbrücken in der Flüssigkeit: gerichtete O–H···O-Kontakte.
+ // Pro Wasserstoff höchstens eine Donorbindung; pro Sauerstoff höchstens
+ // zwei akzeptierte Wasserstoffbrücken. Die Kontakte ändern sich bei Bewegung.
+ const candidates=[];
+ const hydrogenDirections=[0,1.824]; // H–O–H ≈ 104,5°
+ const maxOO=(hot?69:65)*viewZoom;
+ for(let i=0;i<N;i++){
+  const a=pts[i];if(!complete(a))continue;
+  for(let hIdx=0;hIdx<2;hIdx++){
+   const ang=a.theta+hydrogenDirections[hIdx];
+   const ux=Math.cos(ang),uy=Math.sin(ang);
+   const hx=a.x+15*ux,hy=a.y+15*uy;
+   for(let j=0;j<N;j++){
+    if(i===j)continue;
+    const o=pts[j];if(!complete(o))continue;
+    const dx=o.x-a.x,dy=o.y-a.y,oo=Math.hypot(dx,dy);
+    if(oo<22||oo>maxOO)continue;
+    // Das Akzeptor-O muss auf der Verlängerung der O–H-Bindung liegen.
+    const alignment=(dx*ux+dy*uy)/oo;
+    if(alignment<.88)continue;
+    const ho=Math.hypot(o.x-hx,o.y-hy);
+    if(ho<7||ho>maxOO-9)continue;
+    candidates.push({i,j,hIdx,hx,hy,ox:o.x,oy:o.y,score:ho+(1-alignment)*55});
+   }
+  }
+ }
+ candidates.sort((a,b)=>a.score-b.score);
+ const usedHydrogen=new Set(),accepted=new Array(N).fill(0);
+ const selected=[];
+ for(const c of candidates){
+  const key=c.i+':'+c.hIdx;
+  if(usedHydrogen.has(key)||accepted[c.j]>=2)continue;
+  usedHydrogen.add(key);accepted[c.j]++;selected.push(c);
+ }
+ if($('showHB').checked)for(const c of selected){
+  const dx=c.ox-c.hx,dy=c.oy-c.hy,d=Math.hypot(dx,dy);
+  // Die gestrichelte Linie beginnt am Wasserstoff und endet am Akzeptor-Sauerstoff.
+  const trim=8.3/d;
+  line(c.hx,c.hy,c.ox-dx*trim,c.oy-dy*trim,'rgba(131,223,255,.85)',1.8,[4,4]);
+ }
+ pts.forEach(p=>{if(complete(p))molecule(p,p.theta,p.theta+1.824);});
+ mctx.font='12px system-ui';mctx.fillStyle='#c2d9e9';mctx.fillText(hot?'12 °C · größere Abstände (überhöht)':'4 °C · dichtere Anordnung (überhöht)',15,h-14);
+}
+function iceProjectPoint(p,w,h,now){
+ const cx=unit*.99,cy=unit*.99,cz=unit*.99;
+ let x=p.x-cx,y=p.y-cy,z=p.z-cz;
+ const yaw=Math.cos(viewYaw),sy=Math.sin(viewYaw),pitch=Math.cos(viewPitch),sp=Math.sin(viewPitch);
+ const rx=x*yaw+z*sy,rz=-x*sy+z*yaw,ry=y*pitch-rz*sp,depth=y*sp+rz*pitch;
+ const scale=Math.min((w-125)/(unit*3.4),(h-110)/(unit*3.4))*viewZoom;
+ return {x:w/2+rx*scale,y:h/2+ry*scale,depth};
+}
+function projectIce(w,h,now){return lattice.map((p,i)=>{
+ const q={...p};if(!molPaused){q.x+=Math.sin(now*3.2+p.phase)*.018;q.y+=Math.cos(now*3.7+p.phase)*.018;q.z+=Math.sin(now*4.1+p.phase)*.018;}
+ return {...iceProjectPoint(q,w,h,now),idx:i,layer:p.layer};
+});}
+function iceAtom3D(i,j,distance){const a=lattice[i],b=lattice[j],f=distance/OO;return {x:a.x+(b.x-a.x)*f,y:a.y+(b.y-a.y)*f,z:a.z+(b.z-a.z)*f};}
+function drawIce(w,h,now){
+ const pts=projectIce(w,h,now),visible=p=>showLayers||p.layer===0;
+ // Nur ganze Moleküle anzeigen, auch bei starkem Zoom am Bildrand.
+ const complete=p=>p.x>=24&&p.x<=w-24&&p.y>=24&&p.y<=h-24;
+ const shown=p=>visible(p)&&complete(p);
+ if($('showHB').checked)for(const [a,b] of edges){
+  const [from,to]=edgeDirections.get(a+':'+b);
+  if(!shown(pts[from])||!shown(pts[to]))continue;
+  const d= tetraDirs[from].findIndex(v=>{
+   const A=lattice[from],B=lattice[to];return v[0]*(B.x-A.x)/OO+v[1]*(B.y-A.y)/OO+v[2]*(B.z-A.z)/OO>.99;
+  });
+  if(d<0)continue;
+  const H=iceProjectPoint(iceOffset(from,d,OH),w,h,now);
+  const LP=iceProjectPoint(iceOffset(to,tetraDirs[to].findIndex(v=>{
+   const A=lattice[to],B=lattice[from];return v[0]*(B.x-A.x)/OO+v[1]*(B.y-A.y)/OO+v[2]*(B.z-A.z)/OO>.99;
+  }),.33),w,h,now);
+  line(H.x,H.y,pts[to].x,pts[to].y,'rgba(131,223,255,.88)',1.8,[4,4]);
+ }
+ pts.filter(shown).sort((a,b)=>a.depth-b.depth).forEach(p=>{
+  const i=p.idx;
+  // Beide freien Elektronenpaare und beide Wasserstoff-Atome sind IMMER sichtbar,
+  // auch wenn das zugehörige Nachbarmolekül außerhalb des endlichen Gitters liegt.
+  const donorDirs=(i%8)<4?[0,1]:[2,3];
+  const acceptorDirs=(i%8)<4?[2,3]:[0,1];
+  for(const d of acceptorDirs){const lp=iceProjectPoint(iceOffset(i,d,.33),w,h,now);circle(lp.x,lp.y,2.7,'#ffd96b');}
+  for(const d of donorDirs){const hpos=iceProjectPoint(iceOffset(i,d,OH),w,h,now);line(p.x,p.y,hpos.x,hpos.y,'#e7eff7',2.8);circle(hpos.x,hpos.y,4.3,'#f7fcff');}
+  circle(p.x,p.y,7.8,p.layer===1?'#d45465':'#f36c70');
+ });
+ mctx.font='12px system-ui';mctx.fillStyle='#c2d9e9';
+ mctx.fillText('Tetraedrisches Eis-Modell · O···O 2,76 Å · O–H 0,96 Å',12,h-14);
+}
+function renderMolecules(now){requestAnimationFrame(renderMolecules);const dt=lastMolTime?Math.min(.05,(now-lastMolTime)/1000):0;lastMolTime=now;
+ if($('molecular').hidden)return;
+ const w=Math.max(280,molCanvas.getBoundingClientRect().width),h=350,dpr=Math.min(2,window.devicePixelRatio||1);
+ if(molCanvas.width!==Math.round(w*dpr)||molCanvas.height!==Math.round(h*dpr)){molCanvas.width=Math.round(w*dpr);molCanvas.height=Math.round(h*dpr);}
+ mctx.setTransform(dpr,0,0,dpr,0,0);mctx.clearRect(0,0,w,h);
+ if(molTemp===0)drawIce(w,h,now/1000);else drawLiquid(w,h,dt,molTemp===12);
+}
+setMolTemp(4);requestAnimationFrame(renderMolecules);
+</script></body></html>
